@@ -1,0 +1,98 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  FREELANCER
+}
+
+enum ProjectStatus {
+  ACTIVE
+  PAUSED
+  COMPLETED
+}
+
+enum InvoiceStatus {
+  DRAFT
+  SENT
+  PAID
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      Role     @default(FREELANCER)
+  clients   Client[]
+  createdAt DateTime @default(now())
+}
+
+model Client {
+  id        String    @id @default(cuid())
+  name      String
+  email     String?
+  company   String?
+  userId    String
+  user      User      @relation(fields: [userId], references: [id])
+  projects  Project[]
+  createdAt DateTime  @default(now())
+}
+
+model Project {
+  id          String        @id @default(cuid())
+  name        String
+  description String?
+  status      ProjectStatus @default(ACTIVE)
+  hourlyRate  Decimal?      @db.Decimal(10, 2)
+  clientId    String
+  client      Client        @relation(fields: [clientId], references: [id])
+  tasks       Task[]
+  invoices    Invoice[]
+  createdAt   DateTime      @default(now())
+}
+
+model Task {
+  id          String      @id @default(cuid())
+  title       String
+  description String?
+  done        Boolean     @default(false)
+  projectId   String
+  project     Project     @relation(fields: [projectId], references: [id])
+  timeEntries TimeEntry[]
+  createdAt   DateTime    @default(now())
+}
+
+model TimeEntry {
+  id        String   @id @default(cuid())
+  hours     Decimal  @db.Decimal(5, 2)
+  date      DateTime
+  note      String?
+  billed    Boolean  @default(false)
+  taskId    String
+  task      Task     @relation(fields: [taskId], references: [id])
+  createdAt DateTime @default(now())
+}
+
+model Invoice {
+  id        String        @id @default(cuid())
+  number    String        @unique
+  status    InvoiceStatus @default(DRAFT)
+  total     Decimal       @db.Decimal(10, 2)
+  projectId String
+  project   Project       @relation(fields: [projectId], references: [id])
+  issuedAt  DateTime      @default(now())
+  paidAt    DateTime?
+}
