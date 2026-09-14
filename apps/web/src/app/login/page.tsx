@@ -21,9 +21,9 @@ export default function LoginPage() {
 
     try {
       const data = await apiFetch<AuthResponse>('/auth/login', {
-  method: 'POST',
-  body: JSON.stringify({ email, password }),
-});
+        method: 'POST',
+        body: JSON.stringify({ email, password }),
+      });
       login(data.token, data.user);
       router.push('/dashboard');
     } catch (err) {
@@ -41,8 +41,9 @@ export default function LoginPage() {
         {error && <p className="rounded bg-red-50 p-2 text-sm text-red-600">{error}</p>}
 
         <div>
-          <label className="block text-sm font-medium text-gray-700">Correo</label>
+          <label htmlFor="email" className="block text-sm font-medium text-gray-700">Correo</label>
           <input
+            id="email"
             type="email"
             required
             value={email}
@@ -52,8 +53,9 @@ export default function LoginPage() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700">Contraseña</label>
+          <label htmlFor="password" className="block text-sm font-medium text-gray-700">Contraseña</label>
           <input
+            id="password"
             type="password"
             required
             value={password}

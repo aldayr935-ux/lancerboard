@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { apiFetch } from '@/lib/api';
 import type { Client } from '@/types';
+import Link from 'next/link';
 
 export default function DashboardPage() {
   const { user, token, logout, loading } = useAuth();
@@ -95,28 +96,40 @@ export default function DashboardPage() {
           <h2 className="text-lg font-semibold text-gray-900">Nuevo cliente</h2>
 
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-            <input
-              type="text"
-              placeholder="Nombre"
-              required
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="rounded border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none"
-            />
-            <input
-              type="email"
-              placeholder="Correo (opcional)"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="rounded border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none"
-            />
-            <input
-              type="text"
-              placeholder="Empresa (opcional)"
-              value={company}
-              onChange={(e) => setCompany(e.target.value)}
-              className="rounded border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none"
-            />
+            <div>
+              <label htmlFor="clientName" className="sr-only">Nombre</label>
+              <input
+                id="clientName"
+                type="text"
+                placeholder="Nombre"
+                required
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="w-full rounded border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none"
+              />
+            </div>
+            <div>
+              <label htmlFor="clientEmail" className="sr-only">Correo (opcional)</label>
+              <input
+                id="clientEmail"
+                type="email"
+                placeholder="Correo (opcional)"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full rounded border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none"
+              />
+            </div>
+            <div>
+              <label htmlFor="clientCompany" className="sr-only">Empresa (opcional)</label>
+              <input
+                id="clientCompany"
+                type="text"
+                placeholder="Empresa (opcional)"
+                value={company}
+                onChange={(e) => setCompany(e.target.value)}
+                className="w-full rounded border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none"
+              />
+            </div>
           </div>
 
           <button
@@ -140,14 +153,16 @@ export default function DashboardPage() {
           ) : (
             <ul className="divide-y divide-gray-100">
               {clients.map((client) => (
-                <li key={client.id} className="p-4">
-                  <p className="font-medium text-gray-900">{client.name}</p>
-                  {client.company && (
-                    <p className="text-sm text-gray-500">{client.company}</p>
-                  )}
-                  {client.email && (
-                    <p className="text-sm text-gray-500">{client.email}</p>
-                  )}
+                <li key={client.id} className="p-4 hover:bg-gray-50">
+                  <Link href={`/clients/${client.id}`} className="block">
+                    <p className="font-medium text-gray-900">{client.name}</p>
+                    {client.company && (
+                      <p className="text-sm text-gray-500">{client.company}</p>
+                    )}
+                    {client.email && (
+                      <p className="text-sm text-gray-500">{client.email}</p>
+                    )}
+                  </Link>
                 </li>
               ))}
             </ul>

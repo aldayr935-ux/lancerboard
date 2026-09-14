@@ -22,9 +22,9 @@ export default function RegisterPage() {
 
     try {
       const data = await apiFetch<AuthResponse>('/auth/register', {
-  method: 'POST',
-  body: JSON.stringify({ name, email, password }),
-});
+        method: 'POST',
+        body: JSON.stringify({ name, email, password }),
+      });
       login(data.token, data.user);
       router.push('/dashboard');
     } catch (err) {
@@ -42,8 +42,9 @@ export default function RegisterPage() {
         {error && <p className="rounded bg-red-50 p-2 text-sm text-red-600">{error}</p>}
 
         <div>
-          <label className="block text-sm font-medium text-gray-700">Nombre</label>
+          <label htmlFor="name" className="block text-sm font-medium text-gray-700">Nombre</label>
           <input
+            id="name"
             type="text"
             required
             value={name}
@@ -53,8 +54,9 @@ export default function RegisterPage() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700">Correo</label>
+          <label htmlFor="email" className="block text-sm font-medium text-gray-700">Correo</label>
           <input
+            id="email"
             type="email"
             required
             value={email}
@@ -64,8 +66,9 @@ export default function RegisterPage() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700">Contraseña</label>
+          <label htmlFor="password" className="block text-sm font-medium text-gray-700">Contraseña</label>
           <input
+            id="password"
             type="password"
             required
             minLength={6}

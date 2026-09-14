@@ -57,7 +57,7 @@ router.get('/:id', async (req: AuthRequest, res) => {
 
   const project = await prisma.project.findFirst({
     where: { id, client: { userId: req.userId } },
-    include: { client: true, tasks: true },
+    include: { client: true, tasks: {include: { timeEntries : true  }}},
   });
 
   if (!project) return res.status(404).json({ error: 'Proyecto no encontrado' });
