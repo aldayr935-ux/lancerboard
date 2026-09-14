@@ -6,11 +6,11 @@
       "localStorage": [
         {
           "name": "token",
-          "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjbXR4aHNiMnEwMDA2djdiYzFmNzdyem1mIiwicm9sZSI6IkZSRUVMQU5DRVIiLCJpYXQiOjE3ODkxNjM1NTUsImV4cCI6MTc4OTc2ODM1NX0.ITaj2x0ZrhwVQ3pOh29ppoVAL6VnbfOrBRsmd49rr9k"
+          "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjbXUxZ2Q3Z2EwMDEwdjdya2luazZ3Z2FlIiwicm9sZSI6IkZSRUVMQU5DRVIiLCJpYXQiOjE3ODk0MDMwMzYsImV4cCI6MTc5MDAwNzgzNn0.cwJmM4jDfxEX-pUVcBvJ9qLOIz0Rh7sNKfUUduTmBHE"
         },
         {
           "name": "user",
-          "value": "{\"id\":\"cmtxhsb2q0006v7bc1f77rzmf\",\"email\":\"e2e-user-1789163555345@example.com\",\"name\":\"Usuario E2E\"}"
+          "value": "{\"id\":\"cmu1gd7ga0010v7rkink6wgae\",\"email\":\"e2e-user-1789403035184@example.com\",\"name\":\"Usuario E2E\"}"
         }
       ]
     }
