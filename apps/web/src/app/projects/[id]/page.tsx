@@ -55,7 +55,7 @@ export default function ProjectDetailPage() {
         token
       );
 
-      setProject((prev) => prev ? { ...prev, tasks: [data.task, ...prev.tasks] } : prev);
+      setProject((prev) => prev ? { ...prev, tasks: [{ ...data.task, timeEntries: [] }, ...prev.tasks] }: prev);
       setTitle('');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error al crear tarea');
@@ -79,12 +79,7 @@ export default function ProjectDetailPage() {
 
       setProject((prev) =>
         prev
-          ? {
-            ...prev,
-            tasks: prev.tasks.map((t) =>
-              t.id === task.id ? { ...t, done: data.task.done } : t
-            ),
-          }
+          ? { ...prev, tasks: [{ ...data.task, timeEntries: [] }, ...prev.tasks] }
           : prev
       );
     } catch (err) {

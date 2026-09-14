@@ -53,6 +53,52 @@ PORT=4000
 6. Levantar el backend: `npm run dev -w api`
 7. Levantar el frontend: `npm run dev -w web`
 
+## Cómo levantarlo con Docker (recomendado)
+
+La forma más rápida de tener todo el stack corriendo (base de datos, backend y frontend) sin instalar Node.js ni PostgreSQL localmente.
+
+### Requisitos previos
+
+- Docker Desktop (con WSL2 en Windows)
+
+### Pasos
+
+1. Clonar el repositorio
+2. Crear un archivo `.env` en la raíz del proyecto con:
+
+JWT_SECRET=<clave generada>
+
+3. Levantar todo el stack:
+```powershell
+   docker compose up --build
+```
+4. Acceder a la app en `http://localhost:3000`
+
+El comando levanta 3 contenedores:
+- `lancerboard-db` — PostgreSQL con datos persistentes en un volumen
+- `lancerboard-api` — backend Express en el puerto `4000`
+- `lancerboard-web` — frontend Next.js en el puerto `3000`
+
+### Verificar datos en la base de datos
+
+```powershell
+docker exec -it lancerboard-db psql -U lancerboard -d lancerboard
+```
+
+### Reconstruir solo un servicio tras un cambio de código
+
+```powershell
+docker compose up --build web
+# o
+docker compose up --build api
+```
+
+### Apagar todo
+
+```powershell
+docker compose down
+```
+
 ## Endpoints implementados
 
 ### Auth (`/api/auth`)
@@ -111,11 +157,13 @@ PORT=4000
 
 ## Roadmap del proyecto
 
+## Roadmap del proyecto
+
 - [x] Fase 1: MVP — Auth (JWT + bcrypt)
 - [x] Fase 1: CRUD completo de Client, Project, Task, TimeEntry, Invoice
-- [ ] Fase 1: Dashboard en el frontend (Next.js)
-- [ ] Fase 2: Testing E2E con Playwright
-- [ ] Fase 3: Dockerización completa (web + api + db)
+- [x] Fase 1: Dashboard en el frontend (Next.js) — clientes, proyectos, tareas, registro de horas y generación de facturas
+- [x] Fase 2: Testing E2E con Playwright — auth, flujo de negocio completo, storageState para sesiones reutilizables
+- [x] Fase 3: Dockerización completa (web + api + db) con Dockerfiles multi-stage y docker-compose unificado
 - [ ] Fase 4: CI/CD con GitHub Actions
 - [ ] Fase 5: Despliegue con Kubernetes
 - [ ] Fase 6: Documentación final y pulido de portafolio
@@ -125,3 +173,5 @@ PORT=4000
 - **Monorepo con npm workspaces** en vez de repos separados, para facilitar scripts compartidos y despliegue coordinado.
 - **Prisma con `prisma.config.ts`** para la configuración del datasource (versión 6.19+), separando la config de infraestructura del schema de datos.
 - **Aislamiento por usuario a nivel de query**: todas las rutas de negocio filtran por el `userId` del token JWT a través de relaciones anidadas de Prisma, no solo por autenticación.
+- **Dockerfiles multi-stage** para `api` y `web`: separan la etapa de build (dependencias completas, compilación) de la etapa de producción (solo artefactos compilados), reduciendo el tamaño final de las imágenes.
+- **Next.js en modo `standalone`**: genera un build auto-contenido que no depende de `node_modules` completo en producción, ideal para contenedores ligeros.
