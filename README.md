@@ -99,6 +99,15 @@ docker compose up --build api
 docker compose down
 ```
 
+## CI/CD
+
+Cada push o pull request a `main` dispara un workflow de GitHub Actions (`.github/workflows/ci.yml`) con dos jobs:
+
+1. **`test`**: levanta un PostgreSQL de prueba, aplica migraciones, compila backend y frontend, levanta ambos servidores, y corre la suite completa de Playwright contra la app real (no mocks). Sube el reporte HTML de Playwright como artifact si algo falla.
+2. **`docker-build`**: solo corre si `test` pasa. Construye las imágenes Docker de producción (`api` y `web`) para validar que el build funcione correctamente, sin publicarlas todavía a ningún registro.
+
+Puedes ver el historial de ejecuciones en la pestaña **Actions** del repositorio.
+
 ## Endpoints implementados
 
 ### Auth (`/api/auth`)
@@ -159,12 +168,14 @@ docker compose down
 
 ## Roadmap del proyecto
 
+## Roadmap del proyecto
+
 - [x] Fase 1: MVP — Auth (JWT + bcrypt)
 - [x] Fase 1: CRUD completo de Client, Project, Task, TimeEntry, Invoice
 - [x] Fase 1: Dashboard en el frontend (Next.js) — clientes, proyectos, tareas, registro de horas y generación de facturas
 - [x] Fase 2: Testing E2E con Playwright — auth, flujo de negocio completo, storageState para sesiones reutilizables
 - [x] Fase 3: Dockerización completa (web + api + db) con Dockerfiles multi-stage y docker-compose unificado
-- [ ] Fase 4: CI/CD con GitHub Actions
+- [x] Fase 4: CI/CD con GitHub Actions — pipeline que corre migraciones, build, tests E2E y valida imágenes Docker en cada push
 - [ ] Fase 5: Despliegue con Kubernetes
 - [ ] Fase 6: Documentación final y pulido de portafolio
 
@@ -175,3 +186,4 @@ docker compose down
 - **Aislamiento por usuario a nivel de query**: todas las rutas de negocio filtran por el `userId` del token JWT a través de relaciones anidadas de Prisma, no solo por autenticación.
 - **Dockerfiles multi-stage** para `api` y `web`: separan la etapa de build (dependencias completas, compilación) de la etapa de producción (solo artefactos compilados), reduciendo el tamaño final de las imágenes.
 - **Next.js en modo `standalone`**: genera un build auto-contenido que no depende de `node_modules` completo en producción, ideal para contenedores ligeros.
+- **Pipeline de CI con servicios efímeros**: el workflow de GitHub Actions usa un contenedor de PostgreSQL como `service` temporal exclusivo para las pruebas, aislado de cualquier entorno de desarrollo o producción — cada ejecución arranca con una base de datos limpia.
