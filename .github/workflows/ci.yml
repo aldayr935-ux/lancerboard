@@ -59,7 +59,7 @@ jobs:
         run: npm run build --workspace=web
 
       - name: Levantar backend en segundo plano
-        run: npm run start --workspace=api &
+        run: nohup npm run start --workspace=api > backend.log 2>&1 &
         working-directory: .
 
       - name: Instalar navegadores de Playwright
@@ -67,11 +67,19 @@ jobs:
         working-directory: apps/e2e
 
       - name: Levantar frontend en segundo plano
-        run: npx next start --workspace=web &
+        run: nohup npx next start --workspace=web > frontend.log 2>&1 &
 
       - name: Esperar a que los servidores respondan
-        run: npx wait-on http://localhost:4000/health http://localhost:3000
+        run: npx wait-on --timeout 30000 http://localhost:4000/health http://localhost:3000
 
+      - name: Mostrar logs si los servidores no respondieron
+        if: failure()
+        run: |
+          echo "=== Backend log ==="
+          cat backend.log || echo "sin log de backend"
+          echo "=== Frontend log ==="
+          cat frontend.log || echo "sin log de frontend"
+        
       - name: Correr tests E2E con Playwright
         run: npx playwright test
         working-directory: apps/e2e
