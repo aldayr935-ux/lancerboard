@@ -1,0 +1,95 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: lancerboard
+          POSTGRES_PASSWORD: lancerboard_dev
+          POSTGRES_DB: lancerboard
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U lancerboard"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: postgresql://lancerboard:lancerboard_dev@localhost:5432/lancerboard
+      JWT_SECRET: ci_test_secret_key
+      NEXT_PUBLIC_API_URL: http://localhost:4000/api
+      PORT: 4000
+
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Aplicar migraciones de Prisma
+        run: npx prisma migrate deploy --schema=apps/api/prisma/schema.prisma
+        working-directory: apps/api
+
+      - name: Build del backend
+        run: npm run build --workspace=api
+
+      - name: Build del frontend
+        run: npm run build --workspace=web
+
+      - name: Levantar backend en segundo plano
+        run: npm run start --workspace=api &
+        working-directory: .
+
+      - name: Instalar navegadores de Playwright
+        run: npx playwright install --with-deps chromium
+        working-directory: apps/e2e
+
+      - name: Levantar frontend en segundo plano
+        run: npx next start --workspace=web &
+
+      - name: Esperar a que los servidores respondan
+        run: npx wait-on http://localhost:4000/health http://localhost:3000
+
+      - name: Correr tests E2E con Playwright
+        run: npx playwright test
+        working-directory: apps/e2e
+
+      - name: Subir reporte de Playwright
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: apps/e2e/playwright-report/
+          retention-days: 7
+
+  docker-build:
+    runs-on: ubuntu-latest
+    needs: test
+
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
+
+      - name: Construir imagen de la API
+        run: docker build -f apps/api/Dockerfile -t lancerboard-api .
+
+      - name: Construir imagen del frontend
+        run: docker build -f apps/web/Dockerfile -t lancerboard-web --build-arg NEXT_PUBLIC_API_URL=http://localhost:4000/api .
