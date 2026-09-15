@@ -45,7 +45,7 @@ jobs:
         run: npm ci
 
       - name: Aplicar migraciones de Prisma
-        run: npx prisma migrate deploy --schema=apps/api/prisma/schema.prisma
+        run: npx prisma migrate deploy
         working-directory: apps/api
 
       - name: Build del backend
