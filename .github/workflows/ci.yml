@@ -67,7 +67,7 @@ jobs:
         working-directory: apps/e2e
 
       - name: Levantar frontend en segundo plano
-        run: nohup npx next start --workspace=web > frontend.log 2>&1 &
+        run: nohup npm run start --workspace=web > frontend.log 2>&1 &
 
       - name: Esperar a que los servidores respondan
         run: npx wait-on --timeout 30000 http://localhost:4000/health http://localhost:3000
